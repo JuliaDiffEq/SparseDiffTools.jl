@@ -97,7 +97,14 @@ function forwarddiff_color_jacobian(f,x::AbstractArray{<:Number},jac_cache::Forw
 
     for i in eachindex(p)
         partial_i = p[i]
-        t = reshape(Dual{typeof(ForwardDiff.Tag(f,eltype(vecx)))}.(vecx, partial_i),size(t))
+        t = reshape(Dual{typeof(ForwardDiff.Tag(f,eltype(vecx)))}.(vecx, partial_i),size(x))
+        @show typeof(partial_i)
+        @show partial_i
+        @show vecx
+        @show typeof(vecx)
+        @show x
+        @show typeof(x)
+        @show t
         fx = f(t)
         if !(sparsity isa Nothing)
             for j in 1:chunksize
@@ -153,7 +160,7 @@ function forwarddiff_color_jacobian!(J::AbstractMatrix{<:Number},
     chunksize = jac_cache.chunksize
     color_i = 1
     maxcolor = maximum(colorvec)
-    fill!(J, zero(eltype(J)))
+    J .= zero(eltype(J))
 
     if FiniteDiff._use_findstructralnz(sparsity)
         rows_index, cols_index = ArrayInterface.findstructralnz(sparsity)
